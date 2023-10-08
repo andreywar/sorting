@@ -1,6 +1,8 @@
 ﻿#include <iostream>
 #include <array>
 #include <fstream>
+#include<algorithm>
+
 using namespace std;
 
 
@@ -23,25 +25,33 @@ void logging(int comparation, int reposition)
 }
 
 
-void rand_array(int n, int arr[])
+void rand_array(const int n, int arr[])
 {
 	srand(time(0));
     for (int i = 0; i < n; i++)
         *(arr + i) = 1 + rand() % 200;
 }
-void sorting_arr(int n, int arr[]) {
-	for (int i = 0; i < n - 1; i++)
-		for (int j = n - 1; j > 1; j--)
-			if (arr[j - 1] > arr[j])
-				swap(arr[j - 1], arr[j]);
+void sorting_arr(const int n, int arr[]) {
+	int temp;
+	for (int i = 0; i < n - 1; i++) {
+		for (int j = 0; j < n - i - 1; j++)
+		{
+			if (arr[j] > arr[j + 1])
+			{
+				temp = arr[j];
+				arr[j] = arr[j + 1];
+				arr[j + 1] = temp;
+			}
+		}
+	}
 }
-void reversing_arr(int n, int arr[]) {
+void reversing_arr(const int n, int arr[]) {
 	for (int i = 0, j = n - 1; i < j; ++i, --j)
 	{
 		swap(arr[i], arr[j]);
 	}
 }
-void out_array(int n, int arr[]) {
+void out_array(const int n, int arr[]) {
 	cout << "[";
 	for (int i = 0; i < n; i++)
 		cout << arr[i] << ", ";
@@ -49,13 +59,12 @@ void out_array(int n, int arr[]) {
 }
 
 
-void selection(int n, int arr[])
+void selection(const int n, int arr[])
 {
 	int min = 0;
-	int buf = 0;
 	int comparation = 0;
 	int reposition = 0;
-	int *a = arr;
+	int a[200]; copy_n(arr, n, a);
 	for (int i = 0; i < n; i++)
 	{
 		min = i;
@@ -71,32 +80,41 @@ void selection(int n, int arr[])
 		}
 	}
 	logging(comparation, reposition);
+	cout << "Selection" << endl;
 	out_array(n, a);
 }
 
 
-void Bubble_sort(int n, int arr[]) {
-	int* a = arr;
+void Bubble_sort(const int n, int arr[]) 
+{
+	int a[200]; copy_n(arr, n, a);
+	int temp;
 	int comparation = 0;
 	int reposition = 0;
-	for (int i = 0; i < n - 1; i++)
-		for (int j = n - 1; j > 1; j--) {
+	for (int i = 0; i < n - 1; i++) {
+		for (int j = 0; j < n - i - 1; j++)
+		{
 			comparation++;
-			if (a[j - 1] > a[j]) {
+			if (a[j] > a[j + 1])
+			{
 				reposition++;
-				swap(a[j - 1], a[j]);
+				temp = a[j];
+				a[j] = a[j + 1];
+				a[j + 1] = temp;
 			}
 		}
+	}
 	logging(comparation, reposition);
+	cout << "Bubble" << endl;
 	out_array(n, a);
 }
 
 
-void Insert_sort(int n, int arr[])
+void Insert_sort(const int n, int arr[])
 {
 	int comparation = 0;
 	int reposition = 0;
-	int* a = arr;
+	int a[200]; copy_n(arr, n, a);
 	for (int i = 1; i < n; i++) 
 	{
 		for (int j = i; j > 0; j--)
@@ -110,45 +128,52 @@ void Insert_sort(int n, int arr[])
 		}
 	}
 	logging(comparation, reposition);
+	cout << "insert" << endl;
 	out_array(n, a);
 }
 
 
-void binaryInsert(int n, int arr[]) {
-	int i, j, l, r, m, x;
-	int* a = arr;
+void binaryInsert(const int n, int arr[]) {
+	int left, right, key;
+	int a[200]; copy_n(arr, n, a);
 	int comparation = 0;
 	int reposition = 0;
-	for (i = 1; i < n; i++) {
-		x = a[i];
-		l = 1;
-		r = i - 1;
-		while (l <= r)
-		{
-			m = (l + r) / 2;
+	for (int i = 1; i < n; i++)
+	{
+		key = a[i];
+		left = 0, right = i - 1;
+		while (left <= right) {
+			int mid = (left + right) / 2;
 			comparation++;
-			(x < a[m]) ? r = m - 1 : l = m + 1;
+			if (a[mid] > key) {
+				right = mid - 1;
+			}
+			else {
+				left = mid + 1;
+			}
 		}
-		for (j = i - 1; j >= l; j--)
+		for (int j = i - 1; j >= left; j--) {
+			reposition++;
 			a[j + 1] = a[j];
-		reposition++;
-		a[l] = x;
+		}
+		a[left] = key;
 	}
 	logging(comparation, reposition);
+	cout << "binaryInsert" << endl;
 	out_array(n, a);
 }
 
 
-void ShakerSort(int n, int arr[])
+void ShakerSort(const int n, int arr[])
 {
-	int* a = arr;
-	int l = 1;
-	int r = n - 1;
+	int a[200]; copy_n(arr, n, a);
+	int left = 1;
+	int right = n - 1;
 	int comparation = 0;
 	int reposition = 0;
-	while (l <= r)
+	while (left <= right)
 	{
-		for (int i = r; i >= l; i--) {
+		for (int i = right; i >= left; i--) {
 			comparation++;
 			if (a[i - 1] > a[i])
 			{
@@ -156,26 +181,27 @@ void ShakerSort(int n, int arr[])
 				swap(a[i], a[i - 1]);
 			}
 		}
-		l++;
+		left++;
 
 
-		for (int i = l; i <= r; i++) {
+		for (int i = left; i <= right; i++) {
 		comparation++;
-		if (a[i - 1] > a[i]) {
+		if (a[i - 1] > a[i]) 
+		{
 			reposition++;
 			swap(a[i], a[i - 1]);
 		}
 	}
-		r--;
+		right--;
 	}
 	logging(comparation, reposition);
+	cout << "Shaker" << endl;
 	out_array(n, a);
 }
 
-
-void ShellSort(int n, int arr[])
+void ShellSort(const int n, int arr[])
 {
-	int* a = arr;
+	int a[200]; copy_n(arr, n, a);
 	int step = 1;
 	int comparation = 0;
 	int reposition = 0;
@@ -184,22 +210,24 @@ void ShellSort(int n, int arr[])
 		step = step * 3 + 1;
 	}
 
-	while (step > 0) {
+	while (step > 0) 
+	{
 		for (int i = step; i < n; i++) {
 			int temp = a[i];
-			int j = i;
-			comparation++;
+			int j = i;		
+			
 			while (j >= step && a[j - step] > temp) {
+				comparation+=2;
+				reposition++;
 				a[j] = a[j - step];
 				j -= step;
 			}
-			reposition++;
 			a[j] = temp;
 		}
-
 		step = (step - 1) / 3;
 	}
 	logging(comparation, reposition);
+	cout << "Shell" << endl;
 	out_array(n, a);
 }
 
@@ -207,14 +235,14 @@ void ShellSort(int n, int arr[])
 void heap(int a[], int n, int i)
 {
 	int largest = i;
-	int l = 2 * i + 1;
-	int r = 2 * i + 2;
+	int left = 2 * i + 1;
+	int right = 2 * i + 2;
 	heap_comparation++;
-	if (l < n && a[l] > a[largest])
-		largest = l;
+	if (left < n && a[left] > a[largest])
+		largest = left;
 	heap_comparation++;
-	if (r < n && a[r] > a[largest])
-		largest = r;
+	if (right < n && a[right] > a[largest])
+		largest = right;
 
 	if (largest != i)
 	{
@@ -226,9 +254,9 @@ void heap(int a[], int n, int i)
 }
 
 
-void heapSort(int n, int arr[])
+void heapSort(const int n, int arr[])
 {
-	int* a = arr;
+	int a[200]; copy_n(arr, n, a);
 	int comparation = 0;
 	int reposition = 0;
 	for (int i = n / 2 - 1; i >= 0; i--)
@@ -236,20 +264,24 @@ void heapSort(int n, int arr[])
 
 	for (int i = n - 1; i >= 0; i--)
 	{
+		heap_reposition++;
 		swap(a[0], a[i]);
 		heap(a, i, 0);
 	}
 	logging(heap_comparation, heap_reposition);
+	heap_comparation = 0;
+	heap_reposition = 0;
+	cout << "Heap" << endl;
 	out_array(n, a);
 }
 
 
-void qsrt(int n, int a[], int l, int r)
+void qsrt(const int n, int a[], int left, int right)
 {
 	int i, j, x;
-	i = l;
-	j = r;
-	x = a[(l + r) / 2];
+	i = left;
+	j = right;
+	x = a[(left + right) / 2];
 	while (i <= j) {
 		while (a[i] < x) i++;
 		while (x < a[j])j--;{
@@ -262,38 +294,43 @@ void qsrt(int n, int a[], int l, int r)
 			}
 		}
 	}
-	if (l < j) qsrt(n, a, l, j);
-	if (i < r) qsrt(n, a, i, r);
+	qsrt_comparation += 2;
+	if (left < j) qsrt(n, a, left, j);
+	if (i < right) qsrt(n, a, i, right);
 
 }
 
 
-void QuickSort(int n, int arr[]){
-	int* a = arr;
+void QuickSort(const int n, int arr[]){
+	int a[200]; copy_n(arr, n, a);
 	qsrt(n, a, 0, n - 1);
 	logging(qsrt_comparation, qsrt_reposition);
+	qsrt_comparation = 0;
+	qsrt_reposition = 0;
+	cout << "Quick" << endl;
 	out_array(n, a);
 }
 
 
 int main()
 {
-    int n;
-    cin >> n;
+	const int n = 200;
 	ofstream file;
 	file.open("sort_methods.csv");
 	file << "methods/sorts;" << "selection;" << "bubble;" << "insert;" << "binary;" << "shaker;" << "shell;" << "heap;" << "quick;" << endl;
 	file.close();
 
 
-    int* random_arr = new int[n];
+    int random_arr[200];
 	rand_array(n, random_arr);
+	cout << "\n\n\n\n\n";
 	out_array(n, random_arr);
 	file.open("sort_methods.csv", ios::app);
 	file << "random_array;";
 	file.close();
 
 
+	
 	selection(n, random_arr);
 	Bubble_sort(n, random_arr);
 	Insert_sort(n, random_arr);
@@ -302,11 +339,13 @@ int main()
 	ShellSort(n, random_arr);
 	heapSort(n, random_arr);
 	QuickSort(n, random_arr);
+	out_array(n, random_arr);
 
 
-
-	int* sorted_arr = random_arr;
+	int sorted_arr[200];
+	copy_n(random_arr, 200, sorted_arr);
 	sorting_arr(n, sorted_arr);
+	cout << "\n\n\n\n\n";
 	out_array(n, sorted_arr);
 	file.open("sort_methods.csv", ios::app);
 	file << endl << "sorted array;";
@@ -324,8 +363,9 @@ int main()
 
 
 
-	int* reverse_arr = sorted_arr;
-	reversing_arr(n, reverse_arr);
+	int reverse_arr[200];
+	copy_n(sorted_arr, 200, reverse_arr);
+	cout << "\n\n\n\n\n";
 	out_array(n, reverse_arr);
 	file.open("sort_methods.csv", ios::app);
 	file << endl << "reverse array;";
